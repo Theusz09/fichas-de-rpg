@@ -165,6 +165,24 @@ input[type=text]:focus, input[type=number]:focus{
 }
 input::placeholder{color:#5c4c56; font-style:italic;}
 
+textarea{
+  font-family:'Cormorant Garamond', serif;
+  font-size:16px;
+  line-height:1.6;
+  font-style:italic;
+  color:var(--text);
+  background: rgba(0,0,0,.15);
+  border:1px solid var(--line);
+  border-radius:2px;
+  padding:14px 16px;
+  outline:none;
+  resize:vertical;
+  width:100%;
+  transition:border-color .15s;
+}
+textarea:focus{border-color:var(--rose);}
+textarea::placeholder{color:#5c4c56; font-style:italic; opacity:.8;}
+
 /* ===== attributes ===== */
 .attrs-grid{
   display:grid;
