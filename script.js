@@ -29,6 +29,7 @@ function novaFichaVazia(nome = "nova ficha") {
     idade: "",
     pronomes: "",
     ocupacao: "",
+    historia: "",
     attrs,
     vidaAtual: 0, vidaMax: 0,
     sanidadeAtual: 0, sanidadeMax: 0,
