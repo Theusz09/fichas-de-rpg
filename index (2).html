@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dossiê ⟡ fichas de rpg</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="grain"></div>
+
+<header class="topbar">
+  <div class="wordmark">
+    <span class="seal">⟡</span>
+    <div class="wordmark-text">
+      <h1>dossiê</h1>
+      <p>fichas de personagem</p>
+    </div>
+  </div>
+
+  <div class="topbar-actions">
+    <select id="fichaSelect" title="Trocar de ficha"></select>
+    <button id="btnNova" class="btn btn-ghost">+ nova ficha</button>
+    <button id="btnDuplicar" class="btn btn-ghost">duplicar</button>
+    <button id="btnExcluir" class="btn btn-ghost btn-danger">excluir</button>
+    <div class="divider-v"></div>
+    <button id="btnExportJson" class="btn btn-ghost">exportar .json</button>
+    <label class="btn btn-ghost" for="importJson">importar .json</label>
+    <input type="file" id="importJson" accept="application/json" hidden>
+    <button id="btnImprimir" class="btn btn-ghost">imprimir / pdf</button>
+  </div>
+</header>
+
+<main class="sheet" id="sheet">
+
+  <!-- ============ IDENTIFICAÇÃO ============ -->
+  <section class="card">
+    <h2 class="card-title">identificação</h2>
+    <div class="ornament"><span></span>✦<span></span></div>
+
+    <div class="field-grid">
+      <label class="field">
+        <span class="field-label">jogador</span>
+        <input type="text" data-field="jogador" placeholder="quem está por trás do véu">
+      </label>
+      <label class="field">
+        <span class="field-label">nome</span>
+        <input type="text" data-field="nome" placeholder="nome do personagem">
+      </label>
+      <label class="field">
+        <span class="field-label">idade</span>
+        <input type="text" data-field="idade" placeholder="ex: 24">
+      </label>
+      <label class="field">
+        <span class="field-label">pronomes</span>
+        <input type="text" data-field="pronomes" placeholder="ela / ele / elu">
+      </label>
+      <label class="field field-wide">
+        <span class="field-label">ocupação</span>
+        <input type="text" data-field="ocupacao" placeholder="o que faz para sobreviver">
+      </label>
+    </div>
+  </section>
+
+  <!-- ============ HISTÓRIA ============ -->
+  <section class="card">
+    <h2 class="card-title">história</h2>
+    <div class="ornament"><span></span>✦<span></span></div>
+
+    <label class="field field-wide">
+      <span class="field-label">a trajetória do personagem</span>
+      <textarea data-field="historia" rows="8" placeholder="de onde veio, o que viveu, o que carrega até aqui..."></textarea>
+    </label>
+  </section>
+
+  <!-- ============ ATRIBUTOS ============ -->
+  <section class="card">
+    <h2 class="card-title">atributos</h2>
+    <p class="card-subtitle">máx. de atributos: 15</p>
+    <div class="ornament"><span></span>✦<span></span></div>
+
+    <div class="attrs-grid" id="attrsGrid"></div>
+  </section>
+
+  <!-- ============ RECURSOS ============ -->
+  <section class="card">
+    <h2 class="card-title">recursos</h2>
+    <div class="ornament"><span></span>✦<span></span></div>
+
+    <div class="resources-grid">
+      <div class="resource resource-pair">
+        <span class="field-label">vida</span>
+        <div class="pair-input">
+          <input type="number" min="0" data-field="vidaAtual" class="num-sm">
+          <span>/</span>
+          <input type="number" min="0" data-field="vidaMax" class="num-sm">
+        </div>
+        <div class="meter"><div class="meter-fill" data-meter="vida"></div></div>
+      </div>
+
+      <div class="resource resource-pair">
+        <span class="field-label">sanidade</span>
+        <div class="pair-input">
+          <input type="number" min="0" data-field="sanidadeAtual" class="num-sm">
+          <span>/</span>
+          <input type="number" min="0" data-field="sanidadeMax" class="num-sm">
+        </div>
+        <div class="meter"><div class="meter-fill" data-meter="sanidade"></div></div>
+      </div>
+
+      <div class="resource">
+        <span class="field-label">sorte</span>
+        <input type="number" min="0" data-field="sorte" class="num-sm num-solo">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INVENTÁRIO ============ -->
+  <section class="card">
+    <h2 class="card-title">inventário</h2>
+    <div class="inv-head">
+      <p class="card-subtitle">itens carregados</p>
+      <div class="inv-counter">
+        <span id="invCounterText">00/07</span>
+        <label class="field-label" style="margin-left:10px;">máx.
+          <input type="number" min="0" data-field="invMax" class="num-sm" style="width:44px; margin-left:4px;">
+        </label>
+      </div>
+    </div>
+    <div class="ornament"><span></span>✦<span></span></div>
+
+    <div class="slots" id="invSlots"></div>
+
+    <div class="inv-list" id="invList"></div>
+
+    <button class="btn btn-ghost" id="btnAddItem" type="button">+ adicionar item</button>
+  </section>
+
+  <!-- ============ APARÊNCIA ============ -->
+  <section class="card">
+    <h2 class="card-title">aparência do personagem</h2>
+    <div class="ornament"><span></span>✦<span></span></div>
+
+    <div class="gallery" id="gallery"></div>
+
+    <label class="upload-zone" for="imgInput">
+      <span class="upload-plus">+</span>
+      <span>adicionar imagem</span>
+    </label>
+    <input type="file" id="imgInput" accept="image/*" multiple hidden>
+  </section>
+
+  <footer class="save-status" id="saveStatus">tudo salvo neste dispositivo ⟡</footer>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
