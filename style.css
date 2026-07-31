@@ -414,6 +414,22 @@ textarea::placeholder{color:#4a3232; font-style:italic; opacity:.9;}
   .music-toggle{padding:10px;}
 }
 
+/* ===== captura de imagem (baixar como imagem) ===== */
+body.capturing .upload-zone,
+body.capturing .attr-btn,
+body.capturing .inv-item .remove,
+body.capturing #btnAddItem,
+body.capturing .polaroid .remove,
+body.capturing .music-toggle,
+body.capturing .scanlines,
+body.capturing .vignette,
+body.capturing .grain{
+  display:none !important;
+}
+body.capturing input, body.capturing textarea{
+  border-color: transparent;
+}
+
 /* ===== print ===== */
 @media print{
   .topbar, .upload-zone, .attr-btn, .scanlines, .vignette, .grain, .music-toggle{display:none !important;}
