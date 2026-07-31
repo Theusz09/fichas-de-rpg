@@ -261,6 +261,40 @@ document.getElementById("btnExcluir").addEventListener("click", () => {
   renderTudo();
 });
 
+document.getElementById("btnExportJson").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(fichas, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "fichas-rpg.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("importJson").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const importadas = JSON.parse(reader.result);
+      if (!Array.isArray(importadas)) throw new Error("formato inválido");
+      importadas.forEach((f) => {
+        f.id = crypto.randomUUID(); // evita colisão com fichas existentes
+      });
+      fichas = fichas.concat(importadas);
+      fichaAtualId = importadas[0]?.id || fichaAtualId;
+      salvar();
+      renderTudo();
+      alert("fichas importadas com sucesso.");
+    } catch (err) {
+      alert("não foi possível importar este arquivo. verifique se é um .json exportado por este site.");
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+});
+
 document.getElementById("btnImprimir").addEventListener("click", () => window.print());
 
 document.getElementById("btnBaixarImagem").addEventListener("click", async () => {
