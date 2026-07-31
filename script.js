@@ -55,10 +55,10 @@ function carregar() {
 function salvar() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(fichas));
   const status = document.getElementById("saveStatus");
-  status.textContent = "salvo ⟡ " + new Date().toLocaleTimeString("pt-BR");
+  status.textContent = "registrado ⛧ " + new Date().toLocaleTimeString("pt-BR");
   status.style.color = "var(--rose)";
   setTimeout(() => {
-    status.textContent = "tudo salvo neste dispositivo ⟡";
+    status.textContent = "tudo salvo... por enquanto ⛧";
     status.style.color = "";
   }, 1400);
 }
