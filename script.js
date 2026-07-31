@@ -319,6 +319,44 @@ document.getElementById("imgInput").addEventListener("change", (e) => {
   e.target.value = "";
 });
 
+// ============ música ambiente ============
+const MUSIC_PREF_KEY = "dossie_musica_ligada";
+const bgMusic = document.getElementById("bgMusic");
+const musicToggle = document.getElementById("musicToggle");
+
+bgMusic.volume = 0.35;
+
+function setMusicState(tocando) {
+  musicToggle.classList.toggle("playing", tocando);
+  musicToggle.setAttribute("aria-pressed", String(tocando));
+  musicToggle.querySelector(".music-label").textContent = tocando ? "pausar" : "música";
+  localStorage.setItem(MUSIC_PREF_KEY, tocando ? "1" : "0");
+}
+
+musicToggle.addEventListener("click", () => {
+  if (bgMusic.paused) {
+    bgMusic.play().catch(() => {
+      alert("não foi possível tocar o áudio. verifique se o arquivo assets/musica.mp3 existe no site.");
+    });
+    setMusicState(true);
+  } else {
+    bgMusic.pause();
+    setMusicState(false);
+  }
+});
+
+// tenta retomar a música automaticamente se o visitante já tinha deixado ligada
+// (o navegador só permite isso após alguma interação na página)
+if (localStorage.getItem(MUSIC_PREF_KEY) === "1") {
+  const tentarRetomar = () => {
+    bgMusic.play().then(() => setMusicState(true)).catch(() => {});
+    document.removeEventListener("click", tentarRetomar);
+    document.removeEventListener("keydown", tentarRetomar);
+  };
+  document.addEventListener("click", tentarRetomar, { once: true });
+  document.addEventListener("keydown", tentarRetomar, { once: true });
+}
+
 // ============ start ============
 carregar();
 renderTudo();
