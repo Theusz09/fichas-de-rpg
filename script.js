@@ -297,6 +297,37 @@ document.getElementById("importJson").addEventListener("change", (e) => {
 
 document.getElementById("btnImprimir").addEventListener("click", () => window.print());
 
+document.getElementById("btnBaixarImagem").addEventListener("click", async () => {
+  const btn = document.getElementById("btnBaixarImagem");
+  const textoOriginal = btn.textContent;
+  btn.textContent = "gerando...";
+  btn.disabled = true;
+
+  document.body.classList.add("capturing");
+  // pequena espera para o navegador aplicar as mudanças de estilo antes de capturar
+  await new Promise((resolve) => setTimeout(resolve, 80));
+
+  try {
+    const alvo = document.getElementById("sheet");
+    const canvas = await html2canvas(alvo, {
+      backgroundColor: "#080606",
+      scale: 2,
+      useCORS: true,
+    });
+    const link = document.createElement("a");
+    const nomeArquivo = (fichaAtual().nome || "ficha").trim().replace(/[^\p{L}\p{N}\-_ ]/gu, "") || "ficha";
+    link.download = nomeArquivo + ".png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch (err) {
+    alert("não foi possível gerar a imagem da ficha. tente novamente em alguns instantes.");
+  } finally {
+    document.body.classList.remove("capturing");
+    btn.textContent = textoOriginal;
+    btn.disabled = false;
+  }
+});
+
 // ============ eventos: upload de imagens ============
 document.getElementById("imgInput").addEventListener("change", (e) => {
   const files = Array.from(e.target.files);
