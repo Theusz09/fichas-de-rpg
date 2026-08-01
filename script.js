@@ -261,40 +261,6 @@ document.getElementById("btnExcluir").addEventListener("click", () => {
   renderTudo();
 });
 
-document.getElementById("btnExportJson").addEventListener("click", () => {
-  const blob = new Blob([JSON.stringify(fichas, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "fichas-rpg.json";
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-document.getElementById("importJson").addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const importadas = JSON.parse(reader.result);
-      if (!Array.isArray(importadas)) throw new Error("formato inválido");
-      importadas.forEach((f) => {
-        f.id = crypto.randomUUID(); // evita colisão com fichas existentes
-      });
-      fichas = fichas.concat(importadas);
-      fichaAtualId = importadas[0]?.id || fichaAtualId;
-      salvar();
-      renderTudo();
-      alert("fichas importadas com sucesso.");
-    } catch (err) {
-      alert("não foi possível importar este arquivo. verifique se é um .json exportado por este site.");
-    }
-  };
-  reader.readAsText(file);
-  e.target.value = "";
-});
-
 document.getElementById("btnImprimir").addEventListener("click", () => window.print());
 
 document.getElementById("btnBaixarImagem").addEventListener("click", async () => {
@@ -307,9 +273,13 @@ document.getElementById("btnBaixarImagem").addEventListener("click", async () =>
   // pequena espera para o navegador aplicar as mudanças de estilo antes de capturar
   await new Promise((resolve) => setTimeout(resolve, 80));
 
+  let clone = null;
   try {
-    const alvo = document.getElementById("sheet");
-    const canvas = await html2canvas(alvo, {
+    const original = document.getElementById("sheet");
+    clone = criarCloneParaCaptura(original);
+    document.body.appendChild(clone);
+
+    const canvas = await html2canvas(clone, {
       backgroundColor: "#080606",
       scale: 2,
       useCORS: true,
@@ -322,11 +292,58 @@ document.getElementById("btnBaixarImagem").addEventListener("click", async () =>
   } catch (err) {
     alert("não foi possível gerar a imagem da ficha. tente novamente em alguns instantes.");
   } finally {
+    if (clone) clone.remove();
     document.body.classList.remove("capturing");
     btn.textContent = textoOriginal;
     btn.disabled = false;
   }
 });
+
+// html2canvas não consegue "ler" o texto de dentro de <input> e <textarea>
+// (são elementos substituídos pelo navegador). a solução é criar uma cópia
+// da ficha fora da tela, trocando cada campo por um elemento comum (span/div)
+// com o mesmo texto e a mesma aparência, e fotografar essa cópia.
+function criarCloneParaCaptura(original) {
+  const clone = original.cloneNode(true);
+
+  clone.removeAttribute("id");
+  clone.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
+
+  const origCampos = original.querySelectorAll("input[type=text], input[type=number], textarea");
+  const cloneCampos = clone.querySelectorAll("input[type=text], input[type=number], textarea");
+
+  origCampos.forEach((origEl, i) => {
+    const cloneEl = cloneCampos[i];
+    const ehTextarea = origEl.tagName === "TEXTAREA";
+    const substituto = document.createElement(ehTextarea ? "div" : "span");
+    const valor = origEl.value || "";
+    substituto.textContent = valor || origEl.placeholder || "";
+
+    const cs = getComputedStyle(origEl);
+    ["fontFamily", "fontSize", "fontStyle", "fontWeight", "lineHeight", "letterSpacing",
+     "textAlign", "padding", "background", "border", "borderRadius", "width", "display"]
+      .forEach((prop) => { substituto.style[prop] = cs[prop]; });
+
+    substituto.style.color = valor ? cs.color : "#4a3232";
+    substituto.style.whiteSpace = ehTextarea ? "pre-wrap" : "nowrap";
+    substituto.style.borderColor = "transparent";
+    if (ehTextarea) {
+      substituto.style.minHeight = origEl.offsetHeight + "px";
+    }
+
+    cloneEl.replaceWith(substituto);
+  });
+
+  const rect = original.getBoundingClientRect();
+  clone.style.position = "fixed";
+  clone.style.top = "0";
+  clone.style.left = "-99999px";
+  clone.style.width = rect.width + "px";
+  clone.style.margin = "0";
+  clone.style.zIndex = "-1";
+
+  return clone;
+}
 
 // ============ eventos: upload de imagens ============
 document.getElementById("imgInput").addEventListener("change", (e) => {
