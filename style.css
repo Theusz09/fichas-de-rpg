@@ -429,6 +429,12 @@ body.capturing .grain{
 body.capturing input, body.capturing textarea{
   border-color: transparent;
 }
+body.capturing .polaroid img{
+  filter: none !important;
+}
+body.capturing .polaroid::before{
+  box-shadow: none !important;
+}
 
 /* ===== print ===== */
 @media print{
